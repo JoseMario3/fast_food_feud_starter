@@ -5,6 +5,7 @@ import Instructions from "./components/Instructions/Instructions.jsx";
 import Chip from "./components/Chip/Chip.jsx";
 import NutritionalLabel from "./components/NutritionalLabel/NutritionalLabel";
 import { createDataSet } from "./data/dataset";
+import { useState } from "react";
 import "./App.css";
 
 // don't move this!
@@ -25,27 +26,29 @@ export const appInfo = {
 const { data, categories, restaurants } = createDataSet();
 
 export function App() {
-  const [category, setCategory] = React.useState(null);
-  const [restaurant, setRestaurant] = React.useState(null);
-  const [selectedMenuItem, setSelectedMenuItem] = React.useState(null);
+  const [currentCategory, setCategory] = useState("");
+  const [currentRestaurant, setRestaurant] = useState("");
+  const [currentMenuItem, setSelectedMenuItem] = useState(null);
 
   let currentMenuItems = data.filter((d) => {
-    return d.food_category == category && d.restaurant == restaurant;
+    return (
+      d.food_category === currentCategory && d.restaurant === currentRestaurant
+    );
   });
 
-  console.log(data);
+  console.log(currentMenuItems);
   return (
     <main className="App">
       {/* CATEGORIES COLUMN */}
       <div className="CategoriesColumn col">
         <div className="categories options">
           <h2 className="title">Categories</h2>
-          {categories.map((categories) => (
+          {categories.map((category) => (
             <Chip
-              label={categories}
-              key={categories}
-              isActive={categories == category ? true : false}
-              onClick={() => setCategory(categories)}
+              label={category}
+              key={category}
+              isActive={category == currentCategory}
+              onClick={() => setCategory(category)}
             />
           ))}
         </div>
@@ -63,12 +66,12 @@ export function App() {
         <div className="RestaurantsRow">
           <h2 className="title">Restaurants</h2>
           <div className="restaurants options">
-            {restaurants.map((restaurants) => (
+            {restaurants.map((restaurant) => (
               <Chip
-                label={restaurants}
-                key={restaurants}
-                isActive={restaurants == restaurant ? true : false}
-                onClick={() => setRestaurant(restaurants)}
+                label={restaurant}
+                key={restaurant}
+                isActive={restaurant == currentRestaurant}
+                onClick={() => setRestaurant(restaurant)}
               />
             ))}
           </div>
@@ -79,15 +82,13 @@ export function App() {
         <div className="MenuDisplay display">
           <div className="MenuItemButtons menu-items">
             <h2 className="title">Menu Items</h2>
-            {currentMenuItems.map((currentMenuItems, idx) => (
+            {currentMenuItems.map((menuItem, idx) => (
               <Chip
-                label={currentMenuItems.item_name}
+                label={menuItem.item_name}
                 key={idx}
-                isActive={
-                  currentMenuItems.item_name == selectedMenuItem ? true : false
-                }
+                isActive={menuItem === currentMenuItem}
                 onClick={() => {
-                  setSelectedMenuItem(currentMenuItems.food_category);
+                  setSelectedMenuItem(menuItem);
                 }}
               />
             ))}
@@ -95,9 +96,7 @@ export function App() {
 
           {/* NUTRITION FACTS */}
           <div className="NutritionFacts nutrition-facts">
-            {/*selectedMenuItem ? (
-              <NutritionalLabel selectedMenuItem={selectedMenuItem} />
-            ) : null*/}
+            {currentMenuItem != null && <NutritionalLabel item={currentMenuItem}/>}
           </div>
         </div>
         <div className="data-sources">
